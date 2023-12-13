@@ -15,6 +15,7 @@ type Shader struct {
 }
 
 func NewShader(filename string, shaderType uint32) (Shader, error) {
+	// Opening and reading the shader file content
 	file, err := os.Open(filename)
 	if err != nil {
 		return Shader{}, fmt.Errorf("failed to open file: %v", err)
@@ -23,11 +24,19 @@ func NewShader(filename string, shaderType uint32) (Shader, error) {
 	if err != nil {
 		return Shader{}, fmt.Errorf("failed to read: %v", err)
 	}
+
+	// Creating a shader with OpenGL
 	handle := gl.CreateShader(shaderType)
+
+	// Loading the source code
 	csources, free := gl.Strs(string(source) + "\x00")
 	gl.ShaderSource(handle, 1, csources, nil)
 	free()
+
+	// Compile the Shader
 	gl.CompileShader(handle)
+
+	// Checking compilation result
 	var status int32
 	gl.GetShaderiv(handle, gl.COMPILE_STATUS, &status)
 	if status == gl.FALSE {
